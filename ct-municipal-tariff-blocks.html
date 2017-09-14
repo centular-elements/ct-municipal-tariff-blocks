@@ -1,4 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-button/paper-button.html">
 
 <!--
 `ct-municipal-tariff-blocks`
@@ -9,12 +11,41 @@ Element for managing municipal tariff blocks
 
 <dom-module id="ct-municipal-tariff-blocks">
   <template>
-    <style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style is="custom-style">
       :host {
         display: block;
       }
     </style>
-    <h2>Hello [[prop1]]</h2>
+
+    <div class="main-section">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-6 col-xs-12">
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered table-hover table-middle">
+                <thead>
+                  <th>From Units</th>
+                  <th>To Units</th>
+                  <th>Tariff</th>
+                </thead>
+                <tbody>
+                  <template is="dom-repeat" items="[[ blocks ]]">
+                    <tr>
+                      <td>[[item.fromUnits]]</td>
+                      <td>[[item.toUnits]]</td>
+                      <td>[[item.tariff]]</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+              <paper-button class="table-button btn-primary btn-sm" on-tap="_addBlock" raised>Add Block</paper-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </template>
 
   <script>
