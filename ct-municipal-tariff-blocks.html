@@ -21,7 +21,7 @@ Element for managing municipal tariff blocks
     <div class="main-section">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-sm-6 col-xs-12">
+          <div class="col-sm-12 col-xs-12">
             <div class="table-responsive">
               <table class="table table-striped table-bordered table-hover table-middle">
                 <thead>
@@ -36,12 +36,15 @@ Element for managing municipal tariff blocks
                                      readonly
                     ></paper-input></td>
                     <td><paper-input id="toUnitsInput"
+                                     placeholder="∞"
                                      value="{{item.toUnits}}"
+                                     allowed-pattern="[0-9.]"
                                      error-message="Required"
                     ></paper-input></td>
                     <td><paper-input id="tariffInput"
                                      value="{{item.tariff}}"
                                      required
+                                     allowed-pattern="[0-9.]"
                                      auto-validate
                                      error-message="Required"
                     ></paper-input></td>
@@ -49,7 +52,7 @@ Element for managing municipal tariff blocks
                 </template>
                 </tbody>
               </table>
-              <paper-button class="table-button btn-warning btn-sm" on-tap="_removeBlock" raised disabled$="[[ _removeBlockDisabled ]]">Remove Block</paper-button>
+              <paper-button class="table-button btn-warning btn-sm" on-tap="_removeBlock" raised disabled="[[ _removeBlockDisabled ]]">Remove Block</paper-button>
               <paper-button class="table-button btn-primary btn-sm" on-tap="_addBlock" raised>Add Block</paper-button>
             </div>
           </div>
@@ -69,7 +72,7 @@ Element for managing municipal tariff blocks
         utilityType: Number,
         blocks: {
           type: Array,
-          value: []
+          value: function() { return []; }
         },
         _removeBlockDisabled: {
           type: Boolean,
@@ -86,7 +89,6 @@ Element for managing municipal tariff blocks
       },
 
       _validateLastBlock: function(mustBeInfinite) {
-        console.log(this.utilityType);
         var valid = true;
         if (this.blocks.length > 0) {
           var blockRows = Polymer.dom(this.$$('tbody')).querySelectorAll('tr');
@@ -96,6 +98,7 @@ Element for managing municipal tariff blocks
 
           var lastToUnitsInputValid = mustBeInfinite ? !this._isNumeric(lastToUnitsInput.value) : this._isNumeric(lastToUnitsInput.value);
           lastToUnitsInput.invalid = !lastToUnitsInputValid;
+          lastToUnitsInput.errorMessage = mustBeInfinite ? "Must be infinite. Clear this value." : "Required";
           valid = lastToUnitsInputValid && lastTariffInput.validate();
         }
         return valid;
@@ -112,8 +115,9 @@ Element for managing municipal tariff blocks
 
           this.push('blocks', {
             fromUnits: lastBlockToUnits + 0.001,
-            toUnits: '\u221E',
-            tariff: undefined
+            toUnits: undefined,
+            tariff: undefined,
+            utilityType: this.utilityType
           });
 
           this._setRemoveBlockState();
@@ -121,15 +125,24 @@ Element for managing municipal tariff blocks
       },
 
       _setRemoveBlockState: function () {
-        this._removeBlockDisabled = this.blocks == null || this.blocks.length == 0;
+        this._removeBlockDisabled = this.blocks.length == 0;
       },
 
       _removeBlock: function() {
         this.pop('blocks');
         this._setRemoveBlockState();
+      },
+
+      serialize: function () {
+        return this.blocks.map(function (block) {
+          return {
+            fromUnits: parseFloat(block.fromUnits),
+            toUnits: block.toUnits ? parseFloat(block.toUnits) : undefined,
+            tariff: parseFloat(block.tariff),
+            utilityType: block.utilityType
+          }
+        });
       }
-
-
 
     });
   </script>
